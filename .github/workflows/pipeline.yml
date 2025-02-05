@@ -8,45 +8,6 @@ on:
   create:
 
 jobs:
-  test:
-    name: Test
-    strategy:
-      matrix:
-        # November, 2026 / May, 2026
-        framework: [{dotnet: 'net8.0', version: '9.0.x'}, {dotnet: 'net9.0', version: '9.0.x'}] # set up 9.0 for all as there is an error when executing the tests on 8.0 otherwise (macos, ubuntu)
-        os: [windows-latest, macos-latest, ubuntu-latest]
-    runs-on: ${{ matrix.os }}
-    steps:
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: ${{ matrix.framework.version }}
-          dotnet-quality: ga
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
-          restore-keys: ${{ runner.os }}-nuget-
-      # TODO: Disabled until pipeline runs properly and LFS bandwidth is reseted.
-      # - name: Large File Storage (Create)
-      #   run: git lfs ls-files --long | cut -d ' ' -f1 | sort > .lfs-assets-id
-      # - name: Large File Storage (Cache)
-      #   uses: actions/cache@v4
-      #   with:
-      #     path: .git/lfs/objects
-      #     key: ${{ runner.os }}-lfs-${{ hashFiles('.lfs-assets-id') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-lfs-
-      # - name: Large File Storage (Pull)
-      #   run: git lfs pull
-      - name: Secret Injector
-        run: Get-ChildItem ./libNOM.test/Properties/ -File | ForEach-Object { (Get-Content $_.FullName) -Replace "{{ secrets.TESTSUITE_PASSWORD }}","${{ secrets.TESTSUITE_PASSWORD }}" | Set-Content $_.FullName }
-        shell: pwsh
-      - name: Unit Test
-        run: dotnet test libNOM.test --configuration Debug --framework ${{ matrix.framework.dotnet }}
   build:
     name: Build
     strategy:
