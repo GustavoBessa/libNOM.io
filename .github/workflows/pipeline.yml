@@ -2,9 +2,9 @@ name: libNOM.io
 
 on:
   pull_request:
-    branches: [ master ]
+    branches: [ worlds-part-2 ]
   push:
-    branches: [ master ]
+    branches: [ worlds-part-2 ]
   create:
 
 jobs:
